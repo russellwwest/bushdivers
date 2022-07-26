@@ -61,7 +61,7 @@ class CreateCustomRoute
             $data->setCustom(true);
             $data->setUserId($userId);
 
-            $this->storeContract->execute($data, Carbon::now()->addDays(rand(1,8)));
+            $this->storeContract->execute($data, Carbon::now()->addDays(rand(1,8)), $userId);
         } catch (ModelNotFoundException $e) {
             throw new ModelNotFoundException();
         }
