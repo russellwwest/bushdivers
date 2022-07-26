@@ -100,7 +100,8 @@ const Contracts = ({ searchedContracts, airport }) => {
   const bidForContract = async (contract) => {
     const data = {
       contract: contract,
-      icao: searchForm.searchIcao
+      icao: searchForm.searchIcao,
+      userId: auth.user.id
     }
     const bid = axios.post('/api/contracts/bid', data)
     await toast.promise(bid, {

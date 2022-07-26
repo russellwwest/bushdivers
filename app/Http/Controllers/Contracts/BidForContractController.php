@@ -32,7 +32,6 @@ class BidForContractController extends Controller
     public function __invoke(Request $request): JsonResponse
     {
         $cargo = ['name' => $request->contract['cargo'], 'type' => $request->contract['cargo_type'], 'qty' => $request->contract['cargo_qty']];
-
         $data = new ContractInfo();
         $data->setStart($request->contract['departure']);
         $data->setDest($request->contract['destination']['identifier']);
@@ -42,7 +41,7 @@ class BidForContractController extends Controller
         $data->setValue($request->contract['contract_value']);
         $data->setCustom(false);
         $expiry = Carbon::parse($request->contract['expires_at']);
-        $this->storeContract->execute($data, $expiry);
+        $this->storeContract->execute($data, $expiry, $request->userId);
 
         return \response()->json(['message' => 'Contract saved!'], 201);
 
