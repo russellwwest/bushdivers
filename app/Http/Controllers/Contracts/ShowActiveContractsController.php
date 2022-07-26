@@ -19,7 +19,7 @@ class ShowActiveContractsController extends Controller
      */
     public function __invoke(Request $request): Response
     {
-        $customContracts = Contract::with('depAirport', 'arrAirport', 'cargo', 'cargo.currentAirport')
+        $customContracts = Contract::with('depAirport', 'arrAirport', 'currentAirport')
             ->where('is_completed', false)
             ->where('is_available', false)
             ->where('user_id', Auth::user()->id)
@@ -27,7 +27,7 @@ class ShowActiveContractsController extends Controller
             ->orderBy('heading', 'asc')
             ->get();
 
-        $contracts = Contract::with('depAirport', 'arrAirport', 'cargo', 'cargo.currentAirport')
+        $contracts = Contract::with('depAirport', 'arrAirport', 'currentAirport')
             ->where('is_completed', false)
             ->where('is_available', false)
             ->where('contract_type_id', 1)
@@ -36,7 +36,7 @@ class ShowActiveContractsController extends Controller
             ->orderBy('heading', 'asc')
             ->get();
 
-        $community = Contract::with('depAirport', 'arrAirport', 'cargo', 'cargo.currentAirport')
+        $community = Contract::with('depAirport', 'arrAirport', 'currentAirport')
             ->where('is_completed', false)
             ->where('is_available', false)
             ->where('contract_type_id', 3)
