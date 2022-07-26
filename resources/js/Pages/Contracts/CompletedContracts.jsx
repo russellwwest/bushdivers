@@ -3,63 +3,64 @@ import dayjs from '../../Helpers/date.helpers'
 import { Link } from '@inertiajs/inertia-react'
 import Pagination from '../../Shared/Elements/Pagination'
 import AppLayout from '../../Shared/AppLayout'
-import { faPlaneDeparture, faPlaneArrival } from '@fortawesome/free-solid-svg-icons'
+import { faAnchor } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import Tooltip from '../../Shared/Elements/Tooltip'
+
+const AirportToolTip = (props) => {
+  return (
+    <>
+      <div>Altitude: {props.airport.altitude}ft</div>
+      <div>Longest Runway: {props.airport.longest_runway_surface} - {props.airport.longest_runway_length.toLocaleString(navigator.language)}ft x {props.airport.longest_runway_width}ft</div>
+    </>
+  )
+}
 
 const CompletedContracts = ({ contracts }) => {
   return (
     <div className="p-4">
-      <div className="mt-1">
-        {contracts && contracts.data.map((contract) => (
-          <div key={contract.id} className="mt-1 shadow rounded bg-white py-4 px-8 overflow-x-auto">
-            <div className="flex justify-between items-center">
-              <div className="flex flex-col items-center content-center">
-                <FontAwesomeIcon icon={faPlaneDeparture} />
-                <Link href={`/airports/${contract.dep_airport_id}`}>{contract.dep_airport_id}</Link>
-                <div className="text-sm">{contract.dep_airport.name}</div>
-              </div>
-              <div className="flex flex-col items-center content-center">
-                <FontAwesomeIcon icon={faPlaneArrival} />
-                <Link href={`/airports/${contract.arr_airport_id}`}>{contract.arr_airport_id}</Link>
-                <div className="text-sm">{contract.arr_airport.name}</div>
-              </div>
-              <div className="flex flex-col items-center content-center">
-                <div>Distance</div>
-                {contract.distance.toLocaleString(navigator.language)}nm
-              </div>
-              <div className="flex flex-col items-center content-center">
-                <div>Contract Value</div>
-                ${parseFloat(contract.cargo.map(detail => detail.contract_value).reduce((total, num) => total + Math.fround(num), 0)).toFixed(2)}
-              </div>
-              <div className="flex flex-col items-center content-center">
-                <div>Completed Date</div>
-                {dayjs(contract.completed_at).format('DD/MM/YYYY')}
-              </div>
-            </div>
-            <table className="table-condensed table-auto mt-2">
-              <thead>
-              <tr className="">
-                <th>Id</th>
-                <th>Type</th>
-                <th>Cargo</th>
-                <th>Qty</th>
-                <td>Completed Date</td>
+        <div className="rounded shadow bg-white overflow-x-auto my-4">
+        <table className="table-condensed table-auto">
+          <thead>
+          <tr className="">
+            <th>Id</th>
+            <th>Departure</th>
+            <th>Arrival</th>
+            <th>Distance</th>
+            <th>Cargo</th>
+            <th>Value</th>
+            <td>Completed Date</td>
+          </tr>
+          </thead>
+          <tbody>
+          {contracts && contracts.data.length > 0 && contracts.data.map((contract) => (
+              <tr key={contract.id}>
+                <td>{contract.id}</td>
+                <td>
+                  <Tooltip content={<AirportToolTip airport={contract.dep_airport} />} direction="top">
+                    <Link href={`/airports/${contract.dep_airport_id}`}>{contract.dep_airport_id}</Link> {contract.dep_airport.longest_runway_surface === 'W' && <FontAwesomeIcon icon={faAnchor} />}
+                    <span className="text-xs">{contract.dep_airport.name} </span>
+                  </Tooltip>
+                </td>
+                <td>
+                  <Tooltip content={<AirportToolTip airport={contract.arr_airport} />} direction="top">
+                    <Link href={`/airports/${contract.arr_airport_id}`}>{contract.arr_airport_id}</Link> {contract.arr_airport.longest_runway_surface === 'W' && <FontAwesomeIcon icon={faAnchor} />}<br/>
+                    <span className="text-xs">{contract.arr_airport.name}</span>
+                  </Tooltip>
+                </td>
+                <td>{contract.distance.toLocaleString(navigator.language)} nm</td>
+                <td>
+                  {contract.cargo_qty.toLocaleString(navigator.language)} {contract.cargo_type_id === 1 ? 'lbs' : ''} {contract.cargo}
+                </td>
+                {/* <td>${contract.contract_value.toLocaleString()}</td> */}
+                <td>${contract.contract_value}<br/></td>
+                <td>
+                  {dayjs(contract.completed_at).format('DD/MM/YYYY HH:mm')}
+                </td>
               </tr>
-              </thead>
-              <tbody>
-              {contract.cargo.map((cargo) => (
-                <tr key={cargo.id}>
-                  <td>{cargo.id}</td>
-                  <td>{cargo.cargo_type_id === 1 ? <span>Cargo</span> : <span>Passengers</span>}</td>
-                  <td>{cargo.cargo}</td>
-                  <td>{cargo.cargo_qty.toLocaleString(navigator.language)}</td>
-                  <td> {dayjs(cargo.completed_at).format('DD/MM/YYYY')}</td>
-                </tr>
-              ))}
-              </tbody>
-            </table>
-          </div>
-        ))}
+          ))}
+          </tbody>
+        </table>
       </div>
       <div className="mt-2 shadow rounded">
         <Pagination pages={contracts} />
