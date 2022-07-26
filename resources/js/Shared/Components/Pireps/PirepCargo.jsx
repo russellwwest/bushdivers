@@ -19,10 +19,10 @@ const PirepCargo = (props) => {
         {props.cargo.map((detail) => (
           <tr key={detail.id}>
             <td>{detail.id}</td>
-            <td>{detail.contract.dep_airport_id}</td>
-            <td>{detail.contract.arr_airport_id}</td>
-            <td>{detail.contract.distance.toLocaleString(navigator.language)}</td>
-            <td>{detail.contract.heading}</td>
+            <td>{detail.dep_airport_id}</td>
+            <td>{detail.arr_airport_id}</td>
+            <td>{detail.distance.toLocaleString(navigator.language)}</td>
+            <td>{detail.heading}</td>
             <td>{detail.cargo_type_id === 1 ? 'Cargo' : 'Passenger'}</td>
             <td>
               {detail.cargo_type_id === 1
