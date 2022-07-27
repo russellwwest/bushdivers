@@ -4,12 +4,9 @@ namespace Tests\Feature\Api\Tracker;
 
 use App\Models\Aircraft;
 use App\Models\Airport;
-use App\Models\Booking;
 use App\Models\Contract;
-use App\Models\ContractCargo;
 use App\Models\Enums\PirepState;
 use App\Models\Fleet;
-use App\Models\Flight;
 use App\Models\FlightLog;
 use App\Models\Pirep;
 use App\Models\PirepCargo;
@@ -54,12 +51,10 @@ class CancelPirepTest extends TestCase
         $this->contract = Contract::factory()->create([
             'contract_value' => 250.00,
             'dep_airport_id' => 'AYMR',
-            'arr_airport_id' => 'AYMN'
+            'arr_airport_id' => 'AYMN',
+            'current_airport_id' => 'AYMR'
         ]);
-        $this->contractCargo = ContractCargo::factory()->create([
-            'contract_id' => $this->contract->id,
-            'current_airport_id' => $this->contract->dep_airport_id
-        ]);
+
         $this->pirep = Pirep::factory()->create([
             'user_id' => $this->user->id,
             'destination_airport_id' => $this->contract->arr_airport_id,
@@ -69,7 +64,7 @@ class CancelPirepTest extends TestCase
 
         $this->pirepCargo = PirepCargo::factory()->create([
             'pirep_id' => $this->pirep->id,
-            'contract_cargo_id' => $this->contractCargo->id
+            'contract_cargo_id' => $this->contract->id
         ]);
 
         Airport::factory()->create([

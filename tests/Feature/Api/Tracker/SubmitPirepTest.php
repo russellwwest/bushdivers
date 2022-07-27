@@ -7,21 +7,17 @@ use App\Models\Aircraft;
 use App\Models\AircraftEngine;
 use App\Models\AirlineFees;
 use App\Models\Airport;
-use App\Models\Booking;
 use App\Models\Contract;
-use App\Models\ContractCargo;
 use App\Models\Enums\AircraftState;
 use App\Models\Enums\AirlineTransactionTypes;
 use App\Models\Enums\FinancialConsts;
 use App\Models\Enums\PointsType;
 use App\Models\Enums\TransactionTypes;
 use App\Models\Fleet;
-use App\Models\Flight;
 use App\Models\FlightLog;
 use App\Models\Pirep;
 use App\Models\PirepCargo;
 use App\Models\User;
-use App\Services\ContractService;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -40,7 +36,6 @@ class SubmitPirepTest extends TestCase
     protected Model $pirep;
     protected Model $pirepCargo;
     protected Model $contract;
-    protected Model $contractCargo;
     protected Model $fleet;
     protected Model $aircraft;
     protected Model $booking;
@@ -81,15 +76,11 @@ class SubmitPirepTest extends TestCase
         $this->contract = Contract::factory()->create([
             'contract_value' => 250.00,
             'dep_airport_id' => 'AYMR',
-            'arr_airport_id' => 'AYMN'
-        ]);
-        $this->contractCargo = ContractCargo::factory()->create([
-            'contract_id' => $this->contract->id,
-            'current_airport_id' => $this->contract->dep_airport_id,
-            'dep_airport_id' => 'AYMR',
             'arr_airport_id' => 'AYMN',
+            'current_airport_id' => 'AYMR',
             'user_id' => $this->user->id
         ]);
+
         $this->pirep = Pirep::factory()->create([
             'user_id' => $this->user->id,
             'destination_airport_id' => $this->contract->arr_airport_id,
@@ -101,7 +92,7 @@ class SubmitPirepTest extends TestCase
 
         $this->pirepCargo = PirepCargo::factory()->create([
             'pirep_id' => $this->pirep->id,
-            'contract_cargo_id' => $this->contractCargo->id
+            'contract_cargo_id' => $this->contract->id
         ]);
 
         Airport::factory()->create([
@@ -621,8 +612,8 @@ class SubmitPirepTest extends TestCase
 
         $this->postJson('/api/pirep/submit', $data);
 
-        $this->assertDatabaseHas('contract_cargos', [
-            'id' => $this->contractCargo->id,
+        $this->assertDatabaseHas('contracts', [
+            'id' => $this->contract->id,
             'is_completed' => true,
             'current_airport_id' => $this->pirep->destination_airport_id
         ]);
@@ -639,7 +630,7 @@ class SubmitPirepTest extends TestCase
 
         $pirepCargo = PirepCargo::factory()->create([
             'pirep_id' => $pirep->id,
-            'contract_cargo_id' => $this->contractCargo->id
+            'contract_cargo_id' => $this->contract->id
         ]);
 
 
@@ -661,8 +652,8 @@ class SubmitPirepTest extends TestCase
 
         $this->postJson('/api/pirep/submit', $data);
 
-        $this->assertDatabaseHas('contract_cargos', [
-            'id' => $this->contractCargo->id,
+        $this->assertDatabaseHas('contracts', [
+            'id' => $this->contract->id,
             'is_completed' => false,
             'current_airport_id' => 'AYTE',
             'user_id' => null
@@ -696,147 +687,21 @@ class SubmitPirepTest extends TestCase
         ]);
     }
 
-    public function test_multiple_items_for_same_contract_completed()
-    {
-        $contract = Contract::factory()->create([
-            'contract_value' => 250.00,
-            'dep_airport_id' => 'AYMR',
-            'arr_airport_id' => 'AYMN'
-        ]);
-
-        $c1 = ContractCargo::factory()->create([
-            'contract_id' => $contract->id,
-            'current_airport_id' => $contract->dep_airport_id
-        ]);
-
-        $c2 = ContractCargo::factory()->create([
-            'contract_id' => $contract->id,
-            'current_airport_id' => $contract->dep_airport_id
-        ]);
-
-        $pirep = Pirep::factory()->create([
-            'user_id' => $this->user->id,
-            'destination_airport_id' => $contract->arr_airport_id,
-            'departure_airport_id' => $contract->dep_airport_id,
-            'aircraft_id' => $this->aircraft
-        ]);
-
-        PirepCargo::factory()->create([
-            'pirep_id' => $pirep->id,
-            'contract_cargo_id' => $c1->id
-        ]);
-
-        PirepCargo::factory()->create([
-            'pirep_id' => $pirep->id,
-            'contract_cargo_id' => $c2->id
-        ]);
-
-        Sanctum::actingAs(
-            $this->user,
-            ['*']
-        );
-        $startTime = "05/10/2021 01:00:00";
-        $endTime = "05/10/2021 01:45:00";
-
-        $data = [
-            'pirep_id' => $pirep->id,
-            'fuel_used' => 25,
-            'distance' => 76,
-            'landing_rate' => -149.12,
-            'block_off_time'=> $startTime,
-            'block_on_time' => $endTime
-        ];
-
-        $this->postJson('/api/pirep/submit', $data);
-
-        $this->assertDatabaseHas('contracts', [
-            'id' => $contract->id,
-            'is_completed' => true
-        ]);
-    }
-
-    public function test_multiple_items_for_same_contract_not_completed()
-    {
-        $contract = Contract::factory()->create([
-            'contract_value' => 250.00,
-            'dep_airport_id' => 'AYMR',
-            'arr_airport_id' => 'AYMN'
-        ]);
-
-        $c1 = ContractCargo::factory()->create([
-            'contract_id' => $contract->id,
-            'current_airport_id' => $contract->dep_airport_id
-        ]);
-
-        $c2 = ContractCargo::factory()->create([
-            'contract_id' => $contract->id,
-            'current_airport_id' => $contract->dep_airport_id
-        ]);
-
-        $pirep = Pirep::factory()->create([
-            'user_id' => $this->user->id,
-            'destination_airport_id' => 'WAVG',
-            'departure_airport_id' => $contract->dep_airport_id,
-            'aircraft_id' => $this->aircraft
-        ]);
-
-        PirepCargo::factory()->create([
-            'pirep_id' => $pirep->id,
-            'contract_cargo_id' => $c1->id
-        ]);
-
-        PirepCargo::factory()->create([
-            'pirep_id' => $pirep->id,
-            'contract_cargo_id' => $c2->id
-        ]);
-
-        Sanctum::actingAs(
-            $this->user,
-            ['*']
-        );
-        $startTime = "05/10/2021 01:00:00";
-        $endTime = "05/10/2021 01:45:00";
-
-        $data = [
-            'pirep_id' => $pirep->id,
-            'fuel_used' => 25,
-            'distance' => 76,
-            'landing_rate' => -149.12,
-            'block_off_time'=> $startTime,
-            'block_on_time' => $endTime
-        ];
-
-        $this->postJson('/api/pirep/submit', $data);
-
-        $this->assertDatabaseHas('contracts', [
-            'id' => $contract->id,
-            'is_completed' => false
-        ]);
-    }
-
     public function test_multiple_items_for_different_contract_completed()
     {
         $contract1 = Contract::factory()->create([
             'contract_value' => 250.00,
             'dep_airport_id' => 'AYMR',
             'arr_airport_id' => 'AYMN',
-            'user_id' => $this->user->id
+            'user_id' => $this->user->id,
+            'current_airport_id' => 'AYMR'
         ]);
 
         $contract2 = Contract::factory()->create([
             'contract_value' => 400.00,
             'dep_airport_id' => 'AYMR',
             'arr_airport_id' => 'AYMN',
-            'user_id' => $this->user->id
-        ]);
-
-        $contractCargo1 = ContractCargo::factory()->create([
-            'contract_id' => $contract1->id,
-            'current_airport_id' => 'AYMR'
-        ]);
-
-        $contractCargo2 = ContractCargo::factory()->create([
-            'contract_id' => $contract2->id,
+            'user_id' => $this->user->id,
             'current_airport_id' => 'AYMR'
         ]);
 
@@ -849,12 +714,12 @@ class SubmitPirepTest extends TestCase
 
         PirepCargo::factory()->create([
             'pirep_id' => $p->id,
-            'contract_cargo_id' => $contractCargo1->id
+            'contract_cargo_id' => $contract1->id
         ]);
 
         PirepCargo::factory()->create([
             'pirep_id' => $p->id,
-            'contract_cargo_id' => $contractCargo2->id
+            'contract_cargo_id' => $contract2->id
         ]);
 
         Sanctum::actingAs(
@@ -891,23 +756,15 @@ class SubmitPirepTest extends TestCase
         $contract1 = Contract::factory()->create([
             'contract_value' => 250.00,
             'dep_airport_id' => 'AYMR',
-            'arr_airport_id' => 'AYMN'
+            'arr_airport_id' => 'AYMN',
+            'current_airport_id' => 'AYMR',
         ]);
 
         $contract2 = Contract::factory()->create([
             'contract_value' => 400.00,
             'dep_airport_id' => 'AYMR',
-            'arr_airport_id' => 'AYMN'
-        ]);
-
-        $c1 = ContractCargo::factory()->create([
-            'contract_id' => $contract1->id,
-            'current_airport_id' => $contract1->dep_airport_id
-        ]);
-
-        $c2 = ContractCargo::factory()->create([
-            'contract_id' => $contract2->id,
-            'current_airport_id' => $contract2->dep_airport_id
+            'arr_airport_id' => 'AYMN',
+            'current_airport_id' => 'AYMR',
         ]);
 
         $pirep = Pirep::factory()->create([
@@ -919,12 +776,12 @@ class SubmitPirepTest extends TestCase
 
         PirepCargo::factory()->create([
             'pirep_id' => $pirep->id,
-            'contract_cargo_id' => $c1->id
+            'contract_cargo_id' => $contract1->id
         ]);
 
         PirepCargo::factory()->create([
             'pirep_id' => $pirep->id,
-            'contract_cargo_id' => $c2->id
+            'contract_cargo_id' => $contract2->id
         ]);
 
         Sanctum::actingAs(
@@ -961,27 +818,15 @@ class SubmitPirepTest extends TestCase
         $contract1 = Contract::factory()->create([
             'contract_value' => 250.00,
             'dep_airport_id' => 'AYMR',
-            'arr_airport_id' => 'AYMN'
+            'arr_airport_id' => 'AYMN',
+            'current_airport_id' => 'AYMR',
         ]);
 
         $contract2 = Contract::factory()->create([
             'contract_value' => 400.00,
             'dep_airport_id' => 'AYMR',
-            'arr_airport_id' => 'WAVG'
-        ]);
-
-        $c1 = ContractCargo::factory()->create([
-            'contract_id' => $contract1->id,
-            'current_airport_id' => $contract1->dep_airport_id,
-            'dep_airport_id' => 'AYMR',
-            'arr_airport_id' => 'AYMN'
-        ]);
-
-        $c2 = ContractCargo::factory()->create([
-            'contract_id' => $contract2->id,
-            'current_airport_id' => $contract2->dep_airport_id,
-            'dep_airport_id' => 'AYMR',
-            'arr_airport_id' => 'WAVG'
+            'arr_airport_id' => 'WAVG',
+            'current_airport_id' => 'AYMR',
         ]);
 
         $pirep = Pirep::factory()->create([
@@ -993,12 +838,12 @@ class SubmitPirepTest extends TestCase
 
         PirepCargo::factory()->create([
             'pirep_id' => $pirep->id,
-            'contract_cargo_id' => $c1->id
+            'contract_cargo_id' => $contract1->id
         ]);
 
         PirepCargo::factory()->create([
             'pirep_id' => $pirep->id,
-            'contract_cargo_id' => $c2->id
+            'contract_cargo_id' => $contract2->id
         ]);
 
         Sanctum::actingAs(

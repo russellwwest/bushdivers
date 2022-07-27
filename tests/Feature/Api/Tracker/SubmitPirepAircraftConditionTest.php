@@ -7,7 +7,6 @@ use App\Models\AircraftEngine;
 use App\Models\AirlineFees;
 use App\Models\Airport;
 use App\Models\Contract;
-use App\Models\ContractCargo;
 use App\Models\Enums\AirlineTransactionTypes;
 use App\Models\Fleet;
 use App\Models\FlightLog;
@@ -31,7 +30,6 @@ class SubmitPirepAircraftConditionTest extends TestCase
     protected Model $pirep;
     protected Model $pirepCargo;
     protected Model $contract;
-    protected Model $contractCargo;
     protected Model $fleet;
     protected Model $aircraft;
     protected Model $engine;
@@ -72,15 +70,12 @@ class SubmitPirepAircraftConditionTest extends TestCase
         $this->contract = Contract::factory()->create([
             'contract_value' => 250.00,
             'dep_airport_id' => 'AYMR',
-            'arr_airport_id' => 'AYMN'
-        ]);
-        $this->contractCargo = ContractCargo::factory()->create([
-            'contract_id' => $this->contract->id,
-            'current_airport_id' => $this->contract->dep_airport_id,
-            'dep_airport_id' => 'AYMR',
             'arr_airport_id' => 'AYMN',
+            'current_airport_id' => 'AYMR',
             'user_id' => $this->user->id
+
         ]);
+
         $this->pirep = Pirep::factory()->create([
             'user_id' => $this->user->id,
             'destination_airport_id' => $this->contract->arr_airport_id,
@@ -92,7 +87,7 @@ class SubmitPirepAircraftConditionTest extends TestCase
 
         $this->pirepCargo = PirepCargo::factory()->create([
             'pirep_id' => $this->pirep->id,
-            'contract_cargo_id' => $this->contractCargo->id
+            'contract_cargo_id' => $this->contract->id
         ]);
 
         Airport::factory()->create([
