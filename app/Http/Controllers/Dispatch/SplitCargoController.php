@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Dispatch;
 
 use App\Http\Controllers\Controller;
+use App\Models\Contract;
 use App\Models\ContractCargo;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -18,18 +19,23 @@ class SplitCargoController extends Controller
     public function __invoke(Request $request): JsonResponse
     {
         // get current contract cargo
-        $cargo = ContractCargo::find($request->id);
+        $cargo = Contract::find($request->id);
         $updatedQty = $cargo->cargo_qty - $request->qty;
 
         $updatedValue = $cargo->contract_value / ($cargo->cargo_qty / $updatedQty);
         $newItemValue = $cargo->contract_value / ($cargo->cargo_qty / $request->qty);
         // create new row with new figures and update existing row
-        $newCargo = new ContractCargo();
-        $newCargo->contract_id = $cargo->contract_id;
+
+        $newCargo = new Contract();
         $newCargo->cargo_type_id = $cargo->cargo_type_id;
+        $newCargo->contract_type_id = $cargo->contract_type_id;
         $newCargo->current_airport_id = $cargo->current_airport_id;
         $newCargo->dep_airport_id = $cargo->dep_airport_id;
         $newCargo->arr_airport_id = $cargo->arr_airport_id;
+        $newCargo->distance = $cargo->distance;
+        $newCargo->heading = $cargo->heading;
+        $newCargo->expires_at = $cargo->expires_at;
+        $newCargo->accepted_by = $cargo->accepted_by;
         $newCargo->is_available = true;
         $newCargo->cargo = $cargo->cargo;
         $newCargo->cargo_qty = $request->qty;
