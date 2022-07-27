@@ -29,6 +29,7 @@ class CreateContractsTable extends Migration
             $table->dateTime('expires_at');
             $table->dateTime('completed_at')->nullable();
             $table->foreignId('user_id')->nullable();
+            $table->foreignId('accepted_by')->nullable();
             $table->boolean('is_paid')->default(false);
             $table->timestamps();
         });

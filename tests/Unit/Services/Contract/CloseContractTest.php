@@ -3,7 +3,6 @@
 namespace Tests\Unit\Services\Contract;
 
 use App\Models\Contract;
-use App\Models\ContractCargo;
 use App\Services\Contracts\CloseContract;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -30,19 +29,13 @@ class CloseContractTest extends TestCase
     {
         $contract = Contract::factory()->create([
             'is_available' => false,
-            'expires_at' => Carbon::now()->subDays(10)
-        ]);
-        $cargo = ContractCargo::factory()->create([
-            'contract_id' => $contract->id,
+            'expires_at' => Carbon::now()->subDays(10),
             'is_completed' => false,
-            'is_available' => true
         ]);
 
         $this->closeContract->execute($contract->id);
 
         $contract->refresh();
-        $cargo->refresh();
         $this->assertEquals(false, $contract->is_available);
-        $this->assertEquals(false, $cargo->is_available);
     }
 }

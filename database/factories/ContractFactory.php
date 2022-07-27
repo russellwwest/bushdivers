@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Contract;
+use App\Models\Enums\ContractType;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -29,7 +30,12 @@ class ContractFactory extends Factory
             'distance' => 54,
             'heading' => 45,
             'contract_value' => 250,
-            'expires_at' => Carbon::now()->addDays(5)
+            'expires_at' => Carbon::now()->addDays(5),
+            'cargo_type_id' => ContractType::Cargo,
+            'current_airport_id' => 'AYMR',
+            'cargo' => 'Test Cargo',
+            'cargo_qty' => 300,
+            'is_completed' => false
         ];
      }
 }

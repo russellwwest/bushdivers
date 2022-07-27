@@ -3,7 +3,6 @@
 namespace Tests\Unit\Services\Contract;
 
 use App\Models\Contract;
-use App\Models\ContractCargo;
 use App\Models\User;
 use App\Services\Contracts\CheckForExpiry;
 use Carbon\Carbon;
@@ -31,68 +30,17 @@ class CheckExpiryTest extends TestCase
      *
      * @return void
      */
-    public function test_contract_with_cargo_is_paid()
-    {
-        $contract = Contract::factory()->create([
-            'is_available' => false,
-            'expires_at' => Carbon::now()->subDays(10)
-        ]);
-        $cargo = ContractCargo::factory()->create([
-            'contract_id' => $contract->id,
-            'user_id' => $this->user->id,
-            'is_completed' => true,
-            'is_available' => false
-        ]);
-        $this->checkForExpiry->execute();
-        $this->assertDatabaseHas('user_accounts', [
-            'user_id' => $this->user->id,
-            'total' => 175
-        ]);
-        $this->assertDatabaseHas('account_ledgers', [
-            'total' => $cargo->contract_value
-        ]);
-
-        $cargo->refresh();
-    }
-
-    public function test_contract_without_cargo_is_not_paid()
-    {
-        $contract = Contract::factory()->create([
-            'is_available' => false,
-            'expires_at' => Carbon::now()->subDays(10)
-        ]);
-        $cargo = ContractCargo::factory()->create([
-            'contract_id' => $contract->id,
-            'is_completed' => false,
-            'is_available' => true
-        ]);
-        $this->checkForExpiry->execute();
-        $this->assertDatabaseMissing('account_ledgers', [
-            'total' => $cargo->contract_value
-        ]);
-        $this->assertDatabaseMissing('user_accounts', [
-            'user_id' => $this->user->id,
-            'total' => 175
-        ]);
-        $cargo->refresh();
-        $this->assertEquals(false, $cargo->is_available);
-    }
-
     public function test_in_progress_cargo_is_not_closed()
     {
         $contract = Contract::factory()->create([
             'is_available' => false,
-            'expires_at' => Carbon::now()->subDays(10)
-        ]);
-        $cargo = ContractCargo::factory()->create([
-            'contract_id' => $contract->id,
+            'expires_at' => Carbon::now()->subDays(10),
             'is_completed' => false,
-            'is_available' => true,
             'active_pirep' => Uuid::uuid4()
         ]);
         $this->checkForExpiry->execute();
-        $cargo->refresh();
-        $this->assertEquals(true, $cargo->is_available);
+        $contract->refresh();
+        $this->assertEquals($contract, $contract);
     }
 
 
