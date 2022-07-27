@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Pireps;
 
 use App\Events\PirepFiled;
 use App\Http\Requests\ManualPirepRequest;
-use App\Models\ContractCargo;
+use App\Models\Contract;
 use App\Models\Enums\PirepState;
 use App\Models\Enums\PirepStatus;
 use App\Models\Pirep;
@@ -74,8 +74,8 @@ class ProcessPirepSubmissionController extends Controller
 
             $pc = PirepCargo::where('pirep_id', $pirep->id)->get();
             foreach ($pc as $c) {
-                $contractCargo = ContractCargo::find($c->contract_cargo_id);
-                $this->updateContractCargoProgress->execute($contractCargo->id, $pirep->destination_airport_id, $pirep->id);
+                $cargo = Contract::find($c->contract_cargo_id);
+                $this->updateContractCargoProgress->execute($cargo->id, $pirep->destination_airport_id, $pirep->id);
             }
 
             // process points and financials

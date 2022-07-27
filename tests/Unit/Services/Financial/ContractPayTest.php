@@ -116,6 +116,24 @@ class ContractPayTest extends TestCase
         $this->assertEquals($companyPay, $this->contract->contract_value);
     }
 
+//    public function test_company_pay_for_expiry()
+//    {
+//        $contract = Contract::factory()->create([
+//            'is_completed' => true,
+//            'completed_at' => Carbon::now(),
+//            'user_id' => $this->user->id,
+//            'completed_pirep' => $this->pirep->id,
+//            'expires_at' => Carbon::now()->subDays(5)
+//        ]);
+//        $expectedPay = round($this->contract->contract_value * FinancialConsts::ExpiryMultiplier,2);
+//
+//        $p = $this->calcContractPay->execute($this->contract->id);
+//        $this->assertDatabaseHas('account_ledgers', [
+//            'transaction_type' => AirlineTransactionTypes::ContractIncome,
+//            'total' => $expectedPay
+//        ]);
+//    }
+
     public function test_pilot_pay_is_returned_for_private()
     {
         $expectedPay = (FinancialConsts::PrivatePilotPay / 100) * $this->contract->contract_value;
