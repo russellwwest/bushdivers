@@ -70,7 +70,7 @@ class User extends Authenticatable
     public function getCurrentBidsAttribute()
     {
         $customBookings = Contract::where('user_id', $this->id)->where('is_completed', false)->count();
-        $bdBookings = Contract::where('is_available', false)
+        $bdBookings = Contract::where('is_available', true)
             ->where('is_completed', false)
             ->where('user_id', null)
             ->count();

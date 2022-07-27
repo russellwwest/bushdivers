@@ -22,7 +22,7 @@ class StoreContract
         $contract->contract_value = $data->getValue();
         $contract->heading = $data->getHeading();
         $contract->expires_at = $expiry;
-        $contract->is_available = 0;
+        $contract->is_available = true;
         $contract->cargo_type_id = $cargo['type'];
         $contract->cargo_qty = $cargo['qty'];
         $contract->cargo = $cargo['name'];

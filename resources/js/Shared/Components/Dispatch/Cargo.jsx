@@ -46,15 +46,15 @@ const Cargo = (props) => {
                     <td><input id="sel" checked={props.selectedCargo.some(s => s.id === detail.id)} onChange={() => props.handleCargoSelect(detail)} type="checkbox" className="form-checkbox rounded border-gray-300 text-orange-500 shadow-sm focus:border-orange-300 focus:ring focus:ring-offset-0 focus:ring-orange-200 focus:ring-opacity-50" /></td>
                     <td><button className="btn btn-secondary btn-small" onClick={() => props.splitCargo(detail)}>Split</button></td>
                     <td>{detail.current_airport_id}</td>
-                    <td>{detail.contract.arr_airport_id} {detail.contract.arr_airport.longest_runway_surface === 'W' && <span className="material-icons md-18">anchor</span>}</td>
-                    <td>{detail.contract.distance.toLocaleString(navigator.language)} nm</td>
+                    <td>{detail.arr_airport_id} {detail.arr_airport.longest_runway_surface === 'W' && <span className="material-icons md-18">anchor</span>}</td>
+                    <td>{detail.distance.toLocaleString(navigator.language)} nm</td>
                     <td>
                       <div className="flex items-center">
                         <div className="w-1/2">
-                          <span className="mr-2">{detail.contract.heading}</span>
+                          <span className="mr-2">{detail.heading}</span>
                         </div>
                         <div className="w-1/2 flex">
-                          <span style={{ transform: `rotate(${detail.contract.heading}deg)` }}><FontAwesomeIcon icon={faArrowUp} className="text-gray-800" /></span>
+                          <span style={{ transform: `rotate(${detail.heading}deg)` }}><FontAwesomeIcon icon={faArrowUp} className="text-gray-800" /></span>
                         </div>
                       </div>
                     </td>

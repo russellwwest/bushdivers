@@ -1,15 +1,12 @@
 import React, { useEffect, useState } from 'react'
-import NoContent from '../../Shared/Elements/NoContent'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Tooltip from '../../Shared/Elements/Tooltip'
 import { Link, usePage } from '@inertiajs/inertia-react'
 import dayjs, { convertMinuteDecimalToHoursAndMinutes } from '../../Helpers/date.helpers'
 import ContractMap from '../../Shared/Components/Contracts/ContractMap'
 import { Inertia } from '@inertiajs/inertia'
-import CargoDetails from '../../Shared/Components/Contracts/CargoDetails'
 import CustomContract from '../../Shared/Components/Contracts/CustomContract'
 import AppLayout from '../../Shared/AppLayout'
-import StatBlock from '../../Shared/Elements/StatBlock'
 import {
   faAnchor,
   faArrowDownShortWide, faArrowUp,

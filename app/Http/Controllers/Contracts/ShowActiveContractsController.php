@@ -21,7 +21,7 @@ class ShowActiveContractsController extends Controller
     {
         $customContracts = Contract::with('depAirport', 'arrAirport', 'currentAirport')
             ->where('is_completed', false)
-            ->where('is_available', false)
+            ->where('is_available', true)
             ->where('user_id', Auth::user()->id)
             ->orderBy('dep_airport_id', 'asc')
             ->orderBy('heading', 'asc')
@@ -29,7 +29,7 @@ class ShowActiveContractsController extends Controller
 
         $contracts = Contract::with('depAirport', 'arrAirport', 'currentAirport')
             ->where('is_completed', false)
-            ->where('is_available', false)
+            ->where('is_available', true)
             ->where('contract_type_id', 1)
             ->where('user_id', null)
             ->orderBy('dep_airport_id', 'asc')
@@ -38,7 +38,7 @@ class ShowActiveContractsController extends Controller
 
         $community = Contract::with('depAirport', 'arrAirport', 'currentAirport')
             ->where('is_completed', false)
-            ->where('is_available', false)
+            ->where('is_available', true)
             ->where('contract_type_id', 3)
             ->where('user_id', null)
             ->orderBy('dep_airport_id', 'asc')
