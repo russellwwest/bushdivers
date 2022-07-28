@@ -268,3 +268,10 @@ h1 {
 .ribbon-bottom.ribbon-right {
     transform: rotate(-45deg);
 }
+
+.contract-area {
+    height: calc(100vh - 65px);
+}
+.search-area {
+    top: 65px;
+}

@@ -40,15 +40,15 @@ class FindContractsController extends Controller
             $contracts = Cache::get($key);
         } else {
             if ($airport->is_hub) {
-                $numToGenerate = 25;
+                $numToGenerate = 35;
             } else {
-                $numToGenerate = $airport->size >= 3 ? 12 : 5;
+                $numToGenerate = $airport->size >= 3 ? 20 : 12;
             }
             $contracts = $this->generateContracts->execute($airport, $numToGenerate, $request->flightLength, $request->aircraftSize);
             Cache::put($key, $contracts, now()->addSeconds(120));
         }
 
-        return Inertia::render('Contracts/Contracts', ['searchedContracts' => $contracts, 'airport' => $airport]);
+        return Inertia::render('Contracts/ContractSearch', ['searchedContracts' => $contracts, 'airport' => $airport]);
     }
 
     protected function buildCacheKey(string $icao, string $distance, string $size): string

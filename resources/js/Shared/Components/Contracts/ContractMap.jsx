@@ -1,56 +1,86 @@
 import React, { useEffect, useRef, useState } from 'react'
 import maplibre from 'maplibre-gl'
 import { parseMapStyle } from '../../../Helpers/general.helpers'
+import dayjs from '../../../Helpers/date.helpers'
 
 const accessToken = 'pk.eyJ1IjoicnVzc2VsbHd3ZXN0IiwiYSI6ImNrc29vZm5paDEweGIzMnA3MXAzYTFuMDQifQ.7veU-ARmzYClHDFsVQvT5g'
 
-const ContractMap = (props) => {
+const ContractMap = ({ departure, contracts, selectedContract, mapStyle, searchUpdated }) => {
   const mapContainer = useRef(null)
   const map = useRef(null)
-  const marker = useRef(null)
+  const markers = useRef([])
   const depMarker = useRef(null)
   const [sourceSet, setSourceSet] = useState(false)
 
   useEffect(() => {
-    if (map.current) return
+    if (map.current) {
+      if (searchUpdated && markers.current) {
+        markers.current.forEach(marker => {
+          marker.remove()
+        })
+      }
+      return
+    }
     map.current = new maplibre.Map({
       container: mapContainer.current,
-      style: parseMapStyle(props.mapStyle),
-      center: [143.23070, -6.36188],
+      style: parseMapStyle(mapStyle),
+      center: [
+        143.23070,
+        -6.36188
+      ],
       zoom: 9,
       accessToken
     })
   })
 
   useEffect(() => {
-    if (props.departure) {
+    if (departure) {
       if (sourceSet) {
         map.current.removeLayer('route')
         map.current.removeSource('route')
         setSourceSet(false)
       }
-      if (marker.current !== null) {
-        marker.current.remove()
+      if (markers.current !== null) {
+        markers.current = null
       }
-      const depLngLat = [props.departure.lon, props.departure.lat]
+      const depLngLat = [departure.lon, departure.lat]
       loadDeparture(depLngLat)
     }
-  }, [props.departure])
+  }, [departure])
+
+  useEffect(async () => {
+    if (contracts) {
+      if (sourceSet) {
+        if (map.current.getLayer('route')) {
+          map.current.removeLayer('route')
+        }
+        if (map.current.getSource('route')) {
+          map.current.removeSource('route')
+        }
+        setSourceSet(false)
+      }
+      loadContracts()
+    }
+  }, [contracts])
 
   useEffect(() => {
-    if (props.destination) {
+    if (selectedContract) {
       let depLngLat = []
       let arrLngLat = []
-
       if (sourceSet) {
-        map.current.removeLayer('route')
-        map.current.removeSource('route')
+        if (map.current.getLayer('route')) {
+          map.current.removeLayer('route')
+        }
+        if (map.current.getSource('route')) {
+          map.current.removeSource('route')
+        }
         setSourceSet(false)
       }
 
-      if (props.destination !== null) {
-        depLngLat = [props.departure.lon, props.departure.lat]
-        arrLngLat = [props.destination.lon, props.destination.lat]
+      if (selectedContract !== null && Object.keys(selectedContract).length !== 0) {
+        console.log(selectedContract)
+        depLngLat = [departure.lon, departure.lat]
+        arrLngLat = [selectedContract.destination.lon, selectedContract.destination.lat]
 
         if (map.current.isStyleLoaded()) {
           map.current.addSource('route', {
@@ -69,37 +99,52 @@ const ContractMap = (props) => {
             source: 'route',
             paint: {
               'line-color': '#F97316',
-              'line-width': 2
+              'line-width': 2,
+              'line-dasharray': [2, 2]
             }
           })
-          loadDestination(arrLngLat)
           setSourceSet(true)
-
           const bounds = [depLngLat, arrLngLat]
           map.current.fitBounds(bounds, {
-            padding: { top: 70, bottom: 70, right: 70, left: 500 }
+            padding: 150// { top: 150, bottom: 70, right: 70, left: 70 }
           })
         }
       }
     }
-  }, [props.destination])
+  }, [selectedContract])
 
-  const loadDestination = (arrLngLat) => {
-    if (marker.current !== null) {
-      marker.current.remove()
-    }
+  const loadContracts = () => {
+    // if (markers.current.length > 0) {
+    //   markers.current.forEach(marker => {
+    //     console.log('i am inside a marker')
+    //     marker.remove()
+    //   })
+    // }
 
-    const arrPopup = new maplibre.Popup({ offset: 25 }).setText(
-      `${props.destination.identifier} - ${props.destination.name}`
-    )
+    contracts.forEach(contract => {
+      const cPopUp = new maplibre.Popup({
+        offset: 25,
+        closeOnClick: true,
+        closeOnMove: true
+      }).setHTML(
+        `
+        <div>${contract.destination.identifier} - ${contract.destination.name}</div>
+        <div class="flex space-x-2"><div>${contract.distance}nm</div> <div>${contract.heading}&#176;</div></div>
+        <div>${contract.cargo_qty} ${contract.cargo_type === 1 ? '(lbs)' : '(pax)'} ${contract.cargo}</div>
+        <div>${dayjs(contract.expires_at).format('DD/MM/YYYY HH:mm')}</div>
+        `)
 
-    const des = new maplibre.Marker({
-      color: '#F97316'
-    }).setLngLat(arrLngLat)
-      .setPopup(arrPopup)
-      .addTo(map.current)
+      const el = document.createElement('div')
+      el.className = 'bg-green-600 text-white text-xs rounded-full border-white border-2 h-10 w-10 p-1 flex items-center justify-center'
+      el.innerText = contract.destination.identifier
 
-    marker.current = des
+      const contractMarker = new maplibre.Marker(el)
+        .setLngLat([contract.destination.lon, contract.destination.lat])
+        .setPopup(cPopUp)
+        .addTo(map.current)
+      markers.current = markers.current || []
+      markers.current.push(contractMarker)
+    })
   }
 
   const loadDeparture = (depLngLat) => {
@@ -108,23 +153,23 @@ const ContractMap = (props) => {
     }
 
     const depPopup = new maplibre.Popup({ offset: 25 }).setText(
-      `${props.departure.identifier} - ${props.departure.name}`
+      `${departure.identifier} - ${departure.name}`
     )
 
-    const dep = new maplibre.Marker({
-      color: '#059669'
-    }).setLngLat(depLngLat)
+    const dep = document.createElement('div')
+    dep.className = 'bg-orange-500 text-white text-xs rounded-full border-white border-2 h-12 w-12 p-2 flex items-center justify-center'
+    dep.innerText = departure.identifier
+
+    const depM = new maplibre.Marker(dep).setLngLat(depLngLat)
       .setPopup(depPopup)
       .addTo(map.current)
 
-    depMarker.current = dep
+    depMarker.current = depM
     map.current.setCenter(depLngLat)
   }
 
   return (
-    <>
-      <div ref={mapContainer} className={('map-container-' + props.size)} />
-    </>
+    <div ref={mapContainer} className="map-container-full" />
   )
 }
 
