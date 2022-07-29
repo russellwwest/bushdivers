@@ -73,8 +73,8 @@ const AirportDetail = ({ airport, metar, aircraft }) => {
         <Link href={`/airports/${icao}`} className="ml-2 btn btn-secondary">Go</Link>
       </div>
       { !airport
-        ? <h1>Airport Search</h1>
-        : <h1>{airport.name} - {airport.identifier}</h1>
+        ? ''
+        : <h2>{airport.name} - {airport.identifier}</h2>
       }
       { airport && (
       <div className="flex flex-col lg:flex-row justify-between">

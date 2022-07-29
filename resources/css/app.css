@@ -2,22 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
-@font-face {
-    font-family: 'Hornbill';
-    src:
-        local('Hornbill-Personal Use Regular'),
-        url('../fonts/Hornbill-Personal Use Regular.otf')
-        format('opentype');
-}
+/*@font-face {*/
+/*    font-family: 'Hornbill';*/
+/*    src:*/
+/*        local('Hornbill-Personal Use Regular'),*/
+/*        url('../fonts/Hornbill-Personal Use Regular.otf')*/
+/*        format('opentype');*/
+/*}*/
 
-@font-face {
-    font-family: 'Hornbill';
-    src:
-        local('Hornbill-Personal Use Bold'),
-        url('../fonts/Hornbill-Personal Use Bold.otf')
-        format('opentype');
-    font-weight: bold;
-}
+/*@font-face {*/
+/*    font-family: 'Hornbill';*/
+/*    src:*/
+/*        local('Hornbill-Personal Use Bold'),*/
+/*        url('../fonts/Hornbill-Personal Use Bold.otf')*/
+/*        format('opentype');*/
+/*    font-weight: bold;*/
+/*}*/
 
 body {
     font-family: 'Nunito', sans-serif;
@@ -36,9 +36,13 @@ ul.disc {
 }
 
 h1 {
-    font-family: 'Hornbill', sans-serif;
-    font-weight: bold;
-    @apply text-lg;
+    font-family: 'Petrona', sans-serif;
+    @apply text-xl;
+}
+
+.copy {
+    font-family: 'Petrona', sans-serif;
+    @apply text-4xl;
 }
 
 .nav-link {

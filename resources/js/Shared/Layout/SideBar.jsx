@@ -37,6 +37,7 @@ const SideBar = ({ isNavVisible, setNavState }) => {
               src="https://res.cloudinary.com/dji0yvkef/image/upload/v1628691598/BDLogo.png"
               alt="logo"
             />
+            <h1 className="ml-4">Bush Divers</h1>
           </Link>
         </div>
         <FontAwesomeIcon onClick={setNavState} icon={faAnglesLeft} className="lg:hidden cursor-pointer ml-2" />

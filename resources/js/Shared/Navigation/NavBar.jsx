@@ -42,7 +42,7 @@ export default function NavBar () {
                       alt="Workflow"
                     />
                   </Link>
-                  <span className="hidden lg:block ml-3">Bush Divers</span>
+                  <span className="hidden lg:block ml-3"><h1>Bush Divers</h1></span>
                 </div>
                 <div className="hidden sm:block sm:ml-6">
                   <PublicLeftNav />
