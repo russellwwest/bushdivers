@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Contracts;
 
 use App\Http\Controllers\Controller;
+use App\Models\Aircraft;
 use App\Models\Contract;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -45,6 +46,8 @@ class ShowActiveContractsController extends Controller
             ->orderBy('heading', 'asc')
             ->get();
 
-        return Inertia::render('Contracts/MyContracts', ['contracts' => $contracts, 'custom' => $customContracts, 'community' => $community]);
+        $fleet = Aircraft::with('fleet')->where('owner_id', 0)->get();
+
+        return Inertia::render('Contracts/MyContracts', ['contracts' => $contracts, 'custom' => $customContracts, 'community' => $community, 'fleet' => $fleet]);
     }
 }
