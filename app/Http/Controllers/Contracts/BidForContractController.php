@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -42,6 +43,11 @@ class BidForContractController extends Controller
         $data->setCustom(false);
         $expiry = Carbon::parse($request->contract['expires_at']);
         $this->storeContract->execute($data, $expiry, $request->userId);
+
+        if (Cache::has($request->cacheKey)) {
+            Cache::forget($request->cacheKey);
+            Cache::put($request->cacheKey, $request->contracts);
+        }
 
         return \response()->json(['message' => 'Contract saved!'], 201);
 

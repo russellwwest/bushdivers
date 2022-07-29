@@ -19,7 +19,7 @@ import axios from 'axios'
 import { toast } from 'react-hot-toast'
 import ContractMap from '../../Shared/Components/Contracts/ContractMap'
 
-const ContractSearch = ({ searchedContracts, airport }) => {
+const ContractSearch = ({ searchedContracts, airport, cacheKey }) => {
   const { auth } = usePage().props
   const [searchForm, setSearchForm] = useState({
     searchIcao: auth.user.current_airport_id,
@@ -77,11 +77,16 @@ const ContractSearch = ({ searchedContracts, airport }) => {
   }
 
   async function bidForContract (contract) {
+    const newContracts = await contracts.filter(c => c.id !== contract.id)
+
     const data = {
       contract: contract,
       icao: searchForm.searchIcao,
-      userId: auth.user.id
+      userId: auth.user.id,
+      contracts: newContracts,
+      cacheKey
     }
+
     const bid = axios.post('/api/contracts/bid', data)
     await toast.promise(bid, {
       loading: '...Bidding on contract',
@@ -89,7 +94,6 @@ const ContractSearch = ({ searchedContracts, airport }) => {
       error: 'Issue processing bid'
     }, { position: 'top-right' })
 
-    const newContracts = contracts.filter(c => c.id !== contract.id)
     setContracts(newContracts)
   }
 
