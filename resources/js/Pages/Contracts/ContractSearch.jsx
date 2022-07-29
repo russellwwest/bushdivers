@@ -124,22 +124,57 @@ const ContractSearch = ({ searchedContracts, airport }) => {
                 <div className="flex flex-col w-5/6 space-y-2">
                 <div className="flex items-baseline justify-between">
                   <div className="flex items-center space-x-6">
-                    <div className="flex items-center"><FontAwesomeIcon icon={faSuitcase} /><span className="text-lg mx-2">{contract.cargo_type === 1 ? <>{formatNumber(contract.cargo_qty)}</> : <>0</>}</span>lbs</div>
-                    <div className="flex items-center"><FontAwesomeIcon icon={faUserGroup} /><span className="text-lg mx-2">{contract.cargo_type === 2 ? <>{contract.cargo_qty}</> : <>0</>}</span></div>
-                    <div className="flex items-center"><FontAwesomeIcon icon={faCompass} /><span className="text-lg mx-2">{contract.distance}</span>nm</div>
-                    <div className="flex items-center" style={{ transform: `rotate(${contract.heading}deg)` }}><FontAwesomeIcon icon={faArrowUp} className="text-gray-700" /></div>
+                    <div className="flex items-center">
+                      <Tooltip direction="top" content="Cargo">
+                        <FontAwesomeIcon icon={faSuitcase} /><span className="text-lg mx-2">{contract.cargo_type === 1 ? <>{formatNumber(contract.cargo_qty)}</> : <>0</>}</span>lbs
+                      </Tooltip>
+                    </div>
+                    <div className="flex items-center">
+                      <Tooltip direction="top" content="Passengers">
+                        <FontAwesomeIcon icon={faUserGroup} /><span className="text-lg mx-2">{contract.cargo_type === 2 ? <>{contract.cargo_qty}</> : <>0</>}</span>
+                      </Tooltip>
+                    </div>
+                    <div className="flex items-center">
+                      <Tooltip direction="top" content="Distance">
+                        <FontAwesomeIcon icon={faCompass} /><span className="text-lg mx-2">{contract.distance}</span>nm
+                      </Tooltip>
+                    </div>
+                    <div className="flex items-center" style={{ transform: `rotate(${contract.heading}deg)` }}>
+                      <FontAwesomeIcon icon={faArrowUp} className="text-gray-700" />
+                    </div>
                   </div>
-                  <div className="flex items-center"><FontAwesomeIcon icon={faDollarSign} /><span className="text-lg">{formatNumber(contract.contract_value)}</span></div>
+                  <div className="flex items-center">
+                    <Tooltip direction="top" content="Contract value (pilot's will receive less)">
+                      <FontAwesomeIcon icon={faDollarSign} /><span className="text-lg">{formatNumber(contract.contract_value)}</span>
+                    </Tooltip>
+                  </div>
                 </div>
                 <div className="flex items-baseline justify-between">
                   <div className="flex items-center space-x-3">
-                    <div><FontAwesomeIcon icon={faPlaneDeparture} /><span className="text-lg mx-2">{contract.departure}</span></div>
-                    <div><FontAwesomeIcon icon={faPlaneArrival} /><span className="text-lg mx-2">
-                      {contract.destination.identifier} {contract.destination.longest_runway_surface === 'W' ? <FontAwesomeIcon icon={faAnchor} /> : <></>}
-                    </span></div>
-                    <div>{formatNumber(contract.cargo_qty)} {contract.cargo_type === 1 ? '(lbs)' : '(pax)'} {contract.cargo}</div>
+                    <div>
+                      <Tooltip direction="top" content="Departure">
+                        <FontAwesomeIcon icon={faPlaneDeparture} /><span className="text-lg mx-2">{contract.departure}</span>
+                      </Tooltip>
+                    </div>
+                    <div>
+                      <Tooltip direction="top" content="Destination">
+                        <FontAwesomeIcon icon={faPlaneArrival} />
+                        <span className="text-lg mx-2">
+                          {contract.destination.identifier} {contract.destination.longest_runway_surface === 'W' ? <FontAwesomeIcon icon={faAnchor} /> : <></>}
+                        </span>
+                      </Tooltip>
+                    </div>
+                    <div>
+                      <Tooltip direction="top" content="Cargo details">
+                        {formatNumber(contract.cargo_qty)} {contract.cargo_type === 1 ? '(lbs)' : '(pax)'} {contract.cargo}
+                      </Tooltip>
+                    </div>
                   </div>
-                  <div>{dayjs(contract.expires_at).format('DD/MM/YYYY HH:mm')}</div>
+                  <div>
+                    <Tooltip direction="top" content="Expiry date">
+                      {dayjs(contract.expires_at).format('DD/MM/YYYY HH:mm')}
+                    </Tooltip>
+                  </div>
                 </div>
                 </div>
                 <div className="flex items-center justify-end w-1/6">
