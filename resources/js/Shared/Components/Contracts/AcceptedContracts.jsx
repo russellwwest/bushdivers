@@ -78,7 +78,7 @@ const AcceptedContracts = ({ contractsList, cancelBid, selectedContract, updateS
           </div>
         </div>
         <div className="flex items-center justify-end w-1/6">
-          <Tooltip direction="left" content="Accept contract">
+          <Tooltip direction="left" content="Cancel contract">
             <button onClick={() => cancelBid(contract)} className="btn btn-primary btn-small">
               <FontAwesomeIcon icon={faXmark} />
             </button>

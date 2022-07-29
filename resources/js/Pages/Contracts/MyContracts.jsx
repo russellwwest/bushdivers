@@ -69,7 +69,7 @@ const MyContracts = ({ contracts, custom, community, fleet }) => {
           <div className="border-b border-b-gray-200">
             <h2 className="p-2">Available Contracts</h2>
             {contracts && contracts.length > 0 && (
-              <AcceptedContracts contractsList={contracts} selectedContract={selectedContract} updateSelectedContract={updateSelectedContract} />
+              <AcceptedContracts contractsList={contracts} selectedContract={selectedContract} updateSelectedContract={updateSelectedContract} cancelBid={cancelBid} />
             )}
           </div>
           {/*<div className="border-b border-b-gray-200">*/}
