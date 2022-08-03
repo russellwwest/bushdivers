@@ -21,8 +21,8 @@ const MyContractMap = ({ currentLocation, contracts, selectedContract, mapStyle,
       container: mapContainer.current,
       style: parseMapStyle(mapStyle),
       center: [
-        143.23070, // change to current location
-        -6.36188
+        currentLocation.lon, // change to current location
+        currentLocation.lat
       ],
       zoom: 8,
       accessToken
